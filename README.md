@@ -1,4 +1,4 @@
-# COSC2674 - Programming IoT Group Assignment Part 1
+# COSC2674 - Programming IoT Group Assignment Part 2
 
 ## Table of Contents
 
