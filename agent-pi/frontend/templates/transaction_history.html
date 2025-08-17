@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transaction History</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+      .header {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+      .header h2 {
+        margin: 0;
+      }
+      .back-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .back-button:hover {
+        background-color: #45a049;
+      }
+      .table-container {
+        width: 90%;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+      .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .transaction-table th,
+      .transaction-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+      .transaction-table th {
+        background-color: #f2f2f2;
+      }
+      .positive {
+        color: green;
+      }
+      .negative {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Transaction History</h2>
+      <button class="back-button" onclick="window.location.href='/home'">
+        Back to Dashboard
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table class="transaction-table">
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Transaction Amount</th>
+            <th>Transaction Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in transactions | reverse %}
+          <tr>
+            <td>{{ transaction.transactionID }}</td>
+            <td
+              class="{{ 'positive' if transaction.transactionAmount > 0 else 'negative' }}"
+            >
+              {{ '-$' if transaction.transactionAmount < 0 else '+$' }}{{
+              transaction.absAmount | round(2) }}
+            </td>
+            <td>{{ transaction.datetime }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3">No transactions found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

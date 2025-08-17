@@ -1,0 +1,5 @@
+{
+    "master-pi-IP": "10.0.0.27",
+    "master-pi-PORT": 65000,
+    "scooterNum": 4
+}

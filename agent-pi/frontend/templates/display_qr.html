@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Display QR Code</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: {{ '#f4f4f4' if role == 'Customer' else '#f0f0ff' }};
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: {{ '#4caf50' if role == 'Customer' else '#6a0dad' }};
+        color: white;
+        padding: 15px 30px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+        flex: 1;
+        text-align: center;
+      }
+
+      .back-button {
+        padding: 10px;
+        background-color: {{ '#4caf50' if role == 'Customer' else '#6a0dad' }};
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        background-color: {{ '#45a049' if role == 'Customer' else '#5a0cac' }};
+      }
+
+      .description {
+        margin: 5px 0;
+      }
+
+      .qr-code img {
+        width: 500px;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Generated QR Code</h2>
+      <button
+        class="back-button"
+        onclick="window.location.href='{{ url_for('home') if role == 'Customer' else url_for('eng_dashboard') }}'"
+      >
+        Back to Dashboard
+      </button>
+    </div>
+
+    <div class="description">
+      <p>
+        {{ 'Scan this QR code on your scooter to unlock it.' if role ==
+        'Customer' else 'Use this QR code to unlock the scooter for repairs and
+        maintenance.' }}
+      </p>
+    </div>
+
+    <div class="qr-code">
+      <img
+        src="{{ url_for('static', filename='qr-codes/' + qr_code_filename) }}"
+        alt="Failed to create QR Code"
+      />
+    </div>
+  </body>
+</html>

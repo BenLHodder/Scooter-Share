@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Update Scooter Info</title>
+    <style>
+        .header {
+            width: 100%;
+            background-color: #0055de;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+    
+        .header h2 {
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+          }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            white-space: pre-line;
+          }
+        
+        /* Custom select dropdown styling from https://www.cssportal.com/css-select-dropdown-generator/ */
+        .custom-select {
+            position: relative;
+        }
+        
+        .custom-select select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 3px 3px 2px 0px #E2E2E2;
+        }
+        
+        .custom-select select:focus {
+            background: #F2F2F2;
+            border: 1px solid #5A7EC7;
+            border-radius: 5px;
+        }
+        
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            top: 35%;
+            right: 10px;
+            transform: translate(0, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(8% 17%, 0% 25%, 50% 84%, 100% 25%, 92% 17%, 50% 65%);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Update Scooter Info</h2>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="container">
+        <!-- Customer selection dropdown -->
+        <form action="{{ url_for('update_scooter_info') }}" method="GET">
+            <label for="scooter_id">Select Scooter:</label>
+            <div class="custom-select">
+                <select name="scooter_id" id="scooter_id" onchange="this.form.submit()">
+                    <option value="">-- Select a scooter --</option>
+                    {% for scooter in scooters %}
+                        <option value="{{ scooter['scooterID'] }}" {% if selected_scooter and selected_scooter['scooterID'] == scooter['scooterID'] %}selected{% endif %}>
+                            {{scooter['scooterID'] }} {{ scooter['make'] }} {{ scooter['colour'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+
+        {% if selected_scooter %}
+            <!-- Update form -->
+            <form action="{{ url_for('update_scooter_info') }}" method="POST">
+
+                <label for="scooter_id">ID:</label>
+                <input type="scooter_id" name="scooter_id" value="{{ selected_scooter['scooterID'] }}" readonly />
+
+                <label for="make">Make:</label>
+                <input type="text" name="make" value="{{ selected_scooter['make'] }}" required />
+
+                <label for="colour">Colour:</label>
+                <input type="text" name="colour" value="{{ selected_scooter['colour'] }}" required />
+
+                <label for="latitude">Latitude:</label>
+                <input type="text" name="latitude" value="{{ selected_scooter['latitude'] }}" readonly />
+
+                <label for="longitude">Longitude:</label>
+                <input type="text" name="longitude" value="{{ selected_scooter['longitude'] }}" readonly />
+
+                <label for="cost_min">Cost Min:</label>
+                <input type="number" step="0.01" min="0" name="cost_min" value="{{ selected_scooter['costMin'] }}" required />
+
+                <label for="battery_percentage">Battery Percentage:</label>
+                <input type="number" step=any min="0" max="100" name="battery_percentage" value="{{ selected_scooter['batteryPercentage'] }}" readonly />
+
+                <label for="status">Status:</label>
+                <div class="custom-select">
+                    <select name="status" id="status">
+                        <option value="Available" {% if selected_scooter and selected_scooter['status'] == 'Available' %}selected{% endif %}>Available</option>
+                        <option value="Booked" {% if selected_scooter and selected_scooter['status'] == 'Booked' %}selected{% endif %}>Booked</option>
+                        <option value="Logged In" {% if selected_scooter and selected_scooter['status'] == 'Logged In' %}selected{% endif %}>Logged In</option>
+                        <option value="In Use" {% if selected_scooter and selected_scooter['status'] == 'In Use' %}selected{% endif %}>In Use</option>
+                        <option value="Needs Repair" {% if selected_scooter and selected_scooter['status'] == 'Needs Repair' %}selected{% endif %}>Needs Repair</option>
+                        <option value="Repairing" {% if selected_scooter and selected_scooter['status'] == 'Repairing' %}selected{% endif %}>Repairing</option>
+                    </select>
+                </div>
+
+
+                <label for="ip_address">IP Address:</label>
+                <input type="text" name="ip_address" value="{{ selected_scooter['ipAddress'] }}" readonly />
+
+                <button type="submit">Update</button>
+            </form>
+        {% endif %}
+
+        <!-- Button to go back to the customer list -->
+        <button class="back-button" onclick="window.location.href='/home'">
+            Back to Dashboard
+          </button>
+    </div>
+</body>
+</html>

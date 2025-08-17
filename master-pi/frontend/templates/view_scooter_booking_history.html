@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>View Scooter Booking History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+          }
+    
+          .header {
+            width: 100%;
+            background-color: #0055de;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+          }
+    
+          .header h2 {
+            margin: 0;
+          }
+    
+          .header .logout-button {
+            background-color: #ff4c4c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+    
+          .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            white-space: pre-line;
+          }
+    
+          .back-button {
+            background-color: #0055de;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+    
+          .back-button:hover {
+            background-color: #2e75e8;
+          }
+    
+          .error {
+            color: red;
+          }
+    
+          .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            width: 90%;
+            height: 100%;
+            margin-top: 20px;
+          }
+    
+          .panel {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+    
+          .panel h3 {
+            margin-bottom: 15px;
+          }
+    
+          .button {
+            padding: 10px;
+            background-color: #0055de;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 150px;
+          }
+    
+          .button:hover {
+            background-color: #2e75e8;
+          }
+    
+          .scooter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+    
+          .scooter-table th,
+          .scooter-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+          }
+    
+          .scooter-table th {
+            background-color: #f2f2f2;
+          }
+
+        select, input {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        /* Custom select dropdown styling from https://www.cssportal.com/css-select-dropdown-generator/ */
+        .custom-select {
+            position: relative;
+        }
+        
+        .custom-select select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 3px 3px 2px 0px #E2E2E2;
+        }
+        
+        .custom-select select:focus {
+            background: #F2F2F2;
+            border: 1px solid #5A7EC7;
+            border-radius: 5px;
+        }
+        
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            top: 35%;
+            right: 10px;
+            transform: translate(0, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(8% 17%, 0% 25%, 50% 84%, 100% 25%, 92% 17%, 50% 65%);
+        }
+
+        .booking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .booking-table th,
+        .booking-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .booking-table th {
+            background-color: #f2f2f2;
+        }
+        </style>
+    </head>
+        <body>
+        <!-- Header Section -->
+        <div class="header">
+            <h2>View Scooter Booking History</h2>
+            <button class="back-button" onclick="window.location.href='/home'">
+            Back to Dashboard
+            </button>
+        </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="container">
+        <!-- Customer selection dropdown -->
+        <form action="{{ url_for('view_scooter_booking_history') }}" method="GET">
+            <label for="scooter_id">Select Scooter:</label>
+            <div class="custom-select">
+                <select name="scooter_id" id="scooter_id" onchange="this.form.submit()">
+                    <option value="">-- Select a scooter --</option>
+                    {% for scooter in scooters %}
+                        <option value="{{ scooter['scooterID'] }}" {% if selected_scooter and selected_scooter['scooterID'] == scooter['scooterID'] %}selected{% endif %}>
+                            {{scooter['scooterID'] }} {{ scooter['make'] }} {{ scooter['colour'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+
+        {% if selected_scooter %}
+            <!-- Table of Bookings -->
+            <div class="booking-container">
+                <!-- Top Right: All Scooters -->
+                <div class="panel">
+                <h3>All Bookings for Scooter {{selected_scooter['scooterID']}}</h3>
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                          <th>Booking ID</th>
+                          <th>Email</th>
+                          <th>Scooter ID</th>
+                          <th>Start DateTime</th>
+                          <th>End DateTime</th>
+                          <th>Actual Start DateTime</th>
+                          <th>Actual End DateTime</th>
+                          <th>Cost ($)</th>
+                          <th>Deposit Cost ($)</th>
+                          <th>Google ID</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                    <tbody>
+                    {% for booking in scooter_bookings %}
+                        <tr>
+                          <td>{{ booking.booking_id }}</td>
+                          <td>{{ booking.email }}</td>
+                          <td>{{ booking.scooter_id }}</td>
+                          <td>{{ booking.start_datetime }}</td>
+                          <td>{{ booking.end_datetime }}</td>
+                          <td>{{ booking.actual_start_datetime }}</td>
+                          <td>{{ booking.actual_end_datetime }}</td>
+                          <td>{{ booking.cost }}</td>
+                          <td>{{ booking.deposit_cost }}</td>
+                          <td>{{ booking.google_id }}</td>
+                          <td>{{ booking.status }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No bookings found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

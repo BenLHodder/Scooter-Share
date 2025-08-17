@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Book a Scooter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .booking-container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 50%;
+        margin-top: 20px;
+      }
+
+      .booking-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      .form-group input[type="date"],
+      .form-group input[type="time"] {
+        padding: 5px;
+      }
+
+      .button,
+      .back-button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        text-align: center;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .button:hover,
+      .back-button:hover {
+        background-color: #45a049;
+      }
+
+      .back-button {
+        margin: 20px 0;
+        width: auto;
+      }
+
+      .cost-display {
+        margin: 20px 0;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      .error-display {
+        color: red;
+        text-align: center;
+      }
+    </style>
+    <script>
+      function calculateCost() {
+        const scooterSelect = document.getElementById("scooter");
+        const startDate = document.getElementById("start_date").value;
+        const startTime = document.getElementById("start_time").value;
+        const endDate = document.getElementById("end_date").value;
+        const endTime = document.getElementById("end_time").value;
+        const errorDiv = document.getElementById("error");
+
+        // Clear any previous error messages
+        errorDiv.innerText = "";
+
+        // Retrieve scooter costs from data attribute
+        const scooterCosts = JSON.parse(
+          document.getElementById("scooter-costs").textContent
+        );
+
+        const selectedScooter = scooterSelect.value;
+        const costPerMinute = scooterCosts[selectedScooter];
+
+        if (startDate && startTime && endDate && endTime) {
+          const startDateTime = new Date(`${startDate}T${startTime}`);
+          const endDateTime = new Date(`${endDate}T${endTime}`);
+
+          if (endDateTime > startDateTime) {
+            const durationMinutes = (endDateTime - startDateTime) / 60000; // Convert ms to minutes
+            const totalCost = durationMinutes * costPerMinute;
+            const deposit = Math.min(10, durationMinutes) * costPerMinute; // Calculate deposit for up to 10 minutes
+
+            document.getElementById(
+              "cost"
+            ).innerText = `Cost: $${totalCost.toFixed(2)}`;
+            document.getElementById(
+              "deposit"
+            ).innerText = `Deposit: $${deposit.toFixed(2)}`;
+            document.getElementById("cost-input").value = totalCost.toFixed(2);
+            document.getElementById("deposit-input").value = deposit.toFixed(2);
+          } else {
+            document.getElementById("cost").innerText = "Cost: $0.00"; // Reset cost
+            document.getElementById("deposit").innerText = "Deposit: $0.00"; // Reset deposit
+            errorDiv.innerText = "End time must be after start time.";
+          }
+        }
+      }
+
+      function validateBookingTimes() {
+        const startDate = document.getElementById("start_date").value;
+        const startTime = document.getElementById("start_time").value;
+        const endDate = document.getElementById("end_date").value;
+        const endTime = document.getElementById("end_time").value;
+        const errorDiv = document.getElementById("error"); // Reference to error display
+
+        // Clear any previous error messages
+        errorDiv.innerText = "";
+
+        const now = new Date();
+        const startDateTime = new Date(`${startDate}T${startTime}`);
+        const endDateTime = new Date(`${endDate}T${endTime}`);
+
+        // Check if start time is in the past
+        if (startDateTime < now) {
+          errorDiv.innerText = "Start time cannot be in the past.";
+          return false;
+        }
+
+        // Check if end time is at least 10 minutes after start time
+        const tenMinutesLater = new Date(startDateTime.getTime() + 10 * 60000); // 10 minutes in ms
+        if (endDateTime && endDateTime < tenMinutesLater) {
+          errorDiv.innerText =
+            "End time must be at least 10 minutes after start time.";
+          return false;
+        }
+
+        return true;
+      }
+
+      function setMinDatesAndTimes(bookedScooters) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = ("0" + (now.getMonth() + 1)).slice(-2);
+        const day = ("0" + now.getDate()).slice(-2);
+        const hours = ("0" + now.getHours()).slice(-2);
+        const minutes = ("0" + now.getMinutes()).slice(-2);
+
+        const minDate = `${year}-${month}-${day}`;
+        const minTime = `${hours}:${minutes}`;
+
+        const startDateInput = document.getElementById("start_date");
+        const endDateInput = document.getElementById("end_date");
+
+        startDateInput.setAttribute("min", minDate);
+        endDateInput.setAttribute("min", minDate);
+
+        // Disable dates and times based on bookings
+        const dateTimesToDisable = bookedScooters.map((booking) => {
+          return {
+            start: new Date(booking.startDateTime),
+            end: new Date(booking.endDateTime),
+          };
+        });
+
+        const disableTimes = (dateInput, timeInput) => {
+          const disabledTimes = dateTimesToDisable.filter((booking) => {
+            const bookingDate = booking.start.toISOString().split("T")[0];
+            return bookingDate === dateInput.value;
+          });
+
+          if (disabledTimes.length > 0) {
+            // Disable times
+            timeInput.querySelectorAll("option").forEach((option) => {
+              const optionTime = option.value;
+              const optionDateTime = new Date(
+                `${dateInput.value}T${optionTime}`
+              );
+              if (
+                disabledTimes.some(
+                  (booking) =>
+                    optionDateTime >= booking.start &&
+                    optionDateTime <= booking.end
+                )
+              ) {
+                option.disabled = true;
+                option.style.backgroundColor = "#f4f4f4";
+              } else {
+                option.disabled = false;
+                option.style.backgroundColor = "";
+              }
+            });
+          }
+        };
+
+        startDateInput.addEventListener("change", () =>
+          disableTimes(startDateInput)
+        );
+        endDateInput.addEventListener("change", () =>
+          disableTimes(endDateInput)
+        );
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const bookedScooters = JSON.parse(
+          document.getElementById("booked-scooters").textContent
+        );
+        setMinDatesAndTimes(bookedScooters);
+      });
+    </script>
+  </head>
+  <body>
+    <div class="booking-container">
+      <h2>Book a Scooter</h2>
+      <!-- Display flashed messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+      <form
+        action="{{ url_for('book_scooter') }}"
+        method="POST"
+        onsubmit="return validateBookingTimes()"
+      >
+        <div class="form-group">
+          <label for="scooter">Select a Scooter:</label>
+          <select
+            name="scooter"
+            id="scooter"
+            required
+            onchange="calculateCost()"
+          >
+            {% for scooter, cost in scooters.items() %}
+            <option value="{{ scooter }}">
+              {{ scooter }} - ${{ cost }} per minute
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="start_date">Start Date:</label>
+          <input
+            type="date"
+            name="start_date"
+            id="start_date"
+            required
+            onchange="calculateCost()"
+          />
+        </div>
+        <div class="form-group">
+          <label for="start_time">Start Time:</label>
+          <input
+            type="time"
+            name="start_time"
+            id="start_time"
+            step="60"
+            required
+            onchange="calculateCost()"
+          />
+        </div>
+        <div class="form-group">
+          <label for="end_date">End Date:</label>
+          <input
+            type="date"
+            name="end_date"
+            id="end_date"
+            required
+            onchange="calculateCost()"
+          />
+        </div>
+        <div class="form-group">
+          <label for="end_time">End Time:</label>
+          <input
+            type="time"
+            name="end_time"
+            id="end_time"
+            step="60"
+            required
+            onchange="calculateCost()"
+          />
+        </div>
+        <div class="cost-display" id="cost">Cost: $0.00</div>
+        <div class="cost-display" id="deposit">Deposit: $0.00</div>
+        <div class="error-display" id="error"></div>
+        <button type="submit" class="button">Book Scooter</button>
+        <a href="{{ url_for('home') }}" class="back-button"
+          >Back to Dashboard</a
+        >
+        <input type="hidden" name="cost" id="cost-input" />
+        <input type="hidden" name="deposit" id="deposit-input" />
+        <p id="scooter-costs" style="display: none">{{ scooters | tojson }}</p>
+        <p id="booked-scooters" style="display: none">
+          {{ booked_scooters | tojson }}
+        </p>
+      </form>
+    </div>
+  </body>
+</html>

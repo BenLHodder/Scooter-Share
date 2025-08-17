@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Find My Scooter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .back-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        background-color: #45a049;
+      }
+
+      .panel {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+      }
+
+      .button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Find My Scooter</h2>
+      <button class="back-button" onclick="window.location.href='/home'">
+        Back to Dashboard
+      </button>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+      {% for category, message in messages %}
+      <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %} {% if booking %}
+    <div class="panel">
+      <h3>Your Next Active Booking</h3>
+      <p>Scooter Make: {{ booking.scooterID }}</p>
+      <p>Booking Start: {{ booking.startDateTime }}</p>
+      <p>Booking End: {{ booking.endDateTime }}</p>
+      {% if within_time %}
+      <form method="POST">
+        <button type="submit" class="button">Locate Scooter</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <div class="panel">
+      <h3>No Active/Upcoming Bookings</h3>
+      <p>
+        You do not have any active bookings or bookings within the next 10
+        minutes.
+      </p>
+      <p>
+        You can only find your scooter when your booking is about to start or
+        once it has begun.
+      </p>
+    </div>
+    {% endif %}
+  </body>
+</html>

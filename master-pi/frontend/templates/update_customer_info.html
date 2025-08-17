@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Update Customer Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background-color: #0055de;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+    
+        .header h2 {
+        margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            white-space: pre-line;
+          }
+        
+        /* Custom select dropdown styling from https://www.cssportal.com/css-select-dropdown-generator/ */
+        .custom-select {
+            position: relative;
+        }
+        
+        .custom-select select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 3px 3px 2px 0px #E2E2E2;
+        }
+        
+        .custom-select select:focus {
+            background: #F2F2F2;
+            border: 1px solid #5A7EC7;
+            border-radius: 5px;
+        }
+        
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            top: 35%;
+            right: 10px;
+            transform: translate(0, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(8% 17%, 0% 25%, 50% 84%, 100% 25%, 92% 17%, 50% 65%);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Update Customer Info</h2>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="container">
+        <!-- Customer selection dropdown -->
+        <form action="{{ url_for('update_customer_info') }}" method="GET">
+            <label for="customer_email">Select Customer:</label>
+            <div class="custom-select">
+                <select name="customer_email" id="customer_email" onchange="this.form.submit()">
+                    <option value="">-- Select a customer --</option>
+                    {% for customer in customers %}
+                        <option value="{{ customer['email'] }}" {% if selected_customer and selected_customer['email'] == customer['email'] %}selected{% endif %}>
+                            {{ customer['firstName'] }} {{ customer['lastName'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+
+        {% if selected_customer %}
+            <!-- Update form -->
+            <form action="{{ url_for('update_customer_info') }}" method="POST">
+                <input type="hidden" name="customer_id" value="{{ selected_customer['id'] }}" />
+
+                <label for="email">Email:</label>
+                <input type="email" name="email" value="{{ selected_customer['email'] }}" readonly />
+
+                <label for="first_name">First Name:</label>
+                <input type="text" name="first_name" value="{{ selected_customer['firstName'] }}" required />
+
+                <label for="last_name">Last Name:</label>
+                <input type="text" name="last_name" value="{{ selected_customer['lastName'] }}" required />
+
+                <label for="phone_no">Phone Number:</label>
+                <input type="tel" name="phone_no" pattern="[0-9]*" maxlength="15" value="{{ selected_customer['phoneNo'] }}" required />
+
+                <label for="password">Password:</label>
+                <input type="password" name="password" value="{{ selected_customer['password'] }}" readonly />
+
+                <label for="funds">Funds:</label>
+                <input type="funds" name="funds" value="{{ selected_customer['funds'] }}" required />
+
+                <label for="role">Role:</label>
+                <div class="custom-select">
+                    <select name="role" id="role">
+                        <option value="Customer">Customer</option>
+                        <option value="Engineer">Engineer</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+
+                <button type="submit">Update</button>
+            </form>
+        {% endif %}
+
+        <!-- Button to go back to the customer list -->
+        <button class="back-button" onclick="window.location.href='/home'">
+            Back to Dashboard
+          </button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>View Current Bookings</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+      }
+
+      .booking-container {
+        width: 90%;
+        margin-top: 20px;
+      }
+
+      .booking-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .booking-table th,
+      .booking-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .booking-table th {
+        background-color: #f2f2f2;
+      }
+
+      .cancel-button {
+        background-color: #ff4c4c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .cancel-button[disabled] {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .cancel-button:hover {
+        background-color: #e60000;
+      }
+      .cancel-button[disabled]:hover {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .back-button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        background-color: #45a049;
+      }
+
+      .no-bookings-message {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <div class="header">
+      <h2>Your Current Bookings</h2>
+      <!-- Back to Dashboard Button -->
+      <button class="back-button" onclick="window.location.href='/home'">
+        Back to Dashboard
+      </button>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+      {% for category, message in messages %}
+      <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <!-- Booking Table -->
+    <div class="booking-container">
+      {% if bookings %}
+      <table class="booking-table">
+        <thead>
+          <tr>
+            <th>Scooter ID</th>
+            <th>Start Date & Time</th>
+            <th>End Date & Time</th>
+            <th>Duration (minutes)</th>
+            <th>Cost ($)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.scooterID }}</td>
+            <td>{{ booking.startDateTime }}</td>
+            <td>{{ booking.endDateTime }}</td>
+            <td>{{ booking.duration }}</td>
+            <td>{{ booking.cost | round(2) }}</td>
+            <td>
+              <form action="{{ url_for('view_bookings') }}" method="POST">
+                <input
+                  type="hidden"
+                  name="bookingID"
+                  value="{{ booking.bookingID }}"
+                />
+                <button
+                  type="submit"
+                  class="cancel-button"
+                  {%
+                  if
+                  not
+                  booking.can_cancel
+                  %}disabled{%
+                  endif
+                  %}
+                >
+                  Cancel Booking
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="no-bookings-message">You have no current bookings.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>

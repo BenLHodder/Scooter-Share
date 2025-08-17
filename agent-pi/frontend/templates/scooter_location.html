@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scooter Location</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0ff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #6a0dad;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+        flex-grow: 1;
+        text-align: center;
+      }
+
+      #map {
+        height: 400px; /* Set the map height */
+        width: 100%; /* Set the map width */
+        margin-top: 20px;
+      }
+
+      .back-button {
+        padding: 10px;
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        background-color: #5a0cac;
+      }
+    </style>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIkl3XDfZxt3AI-asR1j0zCRRSs1VTrb0"
+      defer
+    ></script>
+    <script>
+      function initMap() {
+          // Get the latitude and longitude passed from Flask
+          const latitude = {{ latitude }};
+          const longitude = {{ longitude }};
+
+          // Create a map centered at the scooter's location
+          const scooterLocation = { lat: latitude, lng: longitude };
+          const map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 15,  // Zoom level
+              center: scooterLocation,
+          });
+
+          // Add a marker at the scooter's location
+          new google.maps.Marker({
+              position: scooterLocation,
+              map: map,
+          });
+      }
+
+      // Initialise the map once the page loads
+      window.onload = initMap;
+    </script>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <div class="header">
+      <h2>Scooter Location - Scooter ID: {{ scooter_id }}</h2>
+      <button
+        class="back-button"
+        onclick="window.location.href='/eng-fault-log-requests'"
+      >
+        Back to Maintenance Requests
+      </button>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map"></div>
+  </body>
+</html>

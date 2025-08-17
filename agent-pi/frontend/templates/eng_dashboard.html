@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Engineer Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0ff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #6a0dad;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+      }
+
+      .logout-button {
+        background-color: #ff4c4c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .dashboard-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 20px;
+        width: 90%;
+        height: 100%;
+        margin-top: 20px;
+      }
+
+      .panel {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .panel h3 {
+        margin-bottom: 15px;
+      }
+
+      .panel p {
+        text-align: center;
+        margin: 15px 0;
+        padding: 0 20px;
+        line-height: 1.5;
+      }
+
+      .button {
+        padding: 10px;
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px 0;
+        width: 150px;
+      }
+
+      .button:hover {
+        background-color: #5a0cac;
+      }
+
+      .scooter-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .scooter-table th,
+      .scooter-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .scooter-table th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <div class="header">
+      <h2>Engineer Access - Welcome, {{ session['first_name'] }}</h2>
+      <!-- Logout button wrapped in a form to send POST request -->
+      <form
+        action="{{ url_for('logout') }}"
+        method="POST"
+        style="display: inline"
+      >
+        <button type="submit" class="logout-button">Logout</button>
+      </form>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+      {% for category, message in messages %}
+      <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <!-- Dashboard Panels -->
+    <div class="dashboard-container">
+      <!-- Top Left: All Scooters and their Status -->
+      <div class="panel">
+        <h3>All Scooters</h3>
+        <table class="scooter-table">
+          <thead>
+            <tr>
+              <th>Make</th>
+              <th>Colour</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Power (%)</th>
+              <th>Current Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for scooter in scooters %}
+            <tr>
+              <td>{{ scooter.make }}</td>
+              <td>{{ scooter.colour }}</td>
+              <td>{{ scooter.latitude }}</td>
+              <td>{{ scooter.longitude }}</td>
+              <td>{{ scooter.power }}%</td>
+              <td>{{ scooter.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top Right: Maintenance Requests (Reported Scooters) -->
+      <div class="panel">
+        <h3>Maintenance Requests</h3>
+        <button
+          class="button"
+          onclick="window.location.href='/eng-fault-log-requests'"
+        >
+          View Requests
+        </button>
+      </div>
+
+      <!-- Bottom Left: QR Code to Unlock Scooter  -->
+      <div class="panel">
+        <h3>Generate Unlock QR Code</h3>
+        <p>
+          Generate a QR code to unlock scooters for free to perform
+          repairs/maintenance
+        </p>
+        <button class="button" onclick="window.location.href='/generate-qr'">
+          Generate QR code
+        </button>
+      </div>
+
+      <!-- Bottom Right: Empty Panel -->
+      <div class="panel"></div>
+    </div>
+  </body>
+</html>

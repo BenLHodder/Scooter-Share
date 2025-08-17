@@ -1,0 +1,7 @@
+{
+  "host": "postgres.pacificreflections.net",
+  "database": "scooter_system",
+  "user": "postgres",
+  "password": "Mayday-Bunny-Isotope8",
+  "port": 10650
+}

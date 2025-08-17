@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Report Fault</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+      }
+
+      .back-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: auto;
+      }
+
+      .back-button:hover {
+        background-color: #45a049;
+      }
+
+      .report-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+      }
+
+      .button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .button:hover {
+        background-color: #45a049;
+      }
+
+      select,
+      textarea {
+        padding: 10px;
+        width: calc(100% - 22px);
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Report Scooter Fault</h2>
+      <button class="back-button" onclick="window.location.href='/home'">
+        Back to Dashboard
+      </button>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+      {% for category, message in messages %}
+      <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="report-container">
+      <form method="POST" action="/report-fault">
+        <label for="scooter_id">Select Scooter:</label>
+        <select name="scooter_id" required>
+          {% for scooter in scooters %}
+          <option value="{{ scooter.scooterID }}">
+            {{ scooter.make }} (ID: {{ scooter.scooterID }})
+          </option>
+          {% endfor %}
+        </select>
+
+        <label for="fault_notes">Describe the Fault:</label>
+        <textarea
+          name="fault_notes"
+          placeholder="Describe the fault..."
+          required
+        ></textarea>
+
+        <button type="submit" class="button">Report Fault</button>
+      </form>
+    </div>
+  </body>
+</html>

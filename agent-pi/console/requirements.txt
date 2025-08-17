@@ -1,0 +1,5 @@
+pwinput==1.0.3
+pygame==2.6.1
+pytz==2024.2
+sense_hat==2.6.0
+Werkzeug==3.0.4

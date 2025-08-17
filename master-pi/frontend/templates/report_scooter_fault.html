@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Report Scooter Fault</title>
+    <style>
+        .header {
+            width: 100%;
+            background-color: #0055de;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+    
+        .header h2 {
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+          }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            white-space: pre-line;
+          }
+        
+        /* Custom select dropdown styling from https://www.cssportal.com/css-select-dropdown-generator/ */
+        .custom-select {
+            position: relative;
+        }
+        
+        .custom-select select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 3px 3px 2px 0px #E2E2E2;
+        }
+        
+        .custom-select select:focus {
+            background: #F2F2F2;
+            border: 1px solid #5A7EC7;
+            border-radius: 5px;
+        }
+        
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            top: 35%;
+            right: 10px;
+            transform: translate(0, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(8% 17%, 0% 25%, 50% 84%, 100% 25%, 92% 17%, 50% 65%);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Report Scooter Fault</h2>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="container">
+        <!-- Customer selection dropdown -->
+        <form action="{{ url_for('report_scooter_fault') }}" method="GET">
+            <label for="scooter_id">Select Scooter:</label>
+            <div class="custom-select">
+                <select name="scooter_id" id="scooter_id" onchange="this.form.submit()">
+                    <option value="">-- Select a scooter --</option>
+                    {% for scooter in scooters %}
+                        <option value="{{ scooter['scooterID'] }}" {% if selected_scooter and selected_scooter['scooterID'] == scooter['scooterID'] %}selected{% endif %}>
+                            {{scooter['scooterID'] }} {{ scooter['make'] }} {{ scooter['colour'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+
+        {% if selected_scooter %}
+            <!-- Update form -->
+            <form action="{{ url_for('report_scooter_fault') }}" method="POST">
+
+                <!-- Hidden scooter_id field -->
+                <label for="scooter_id" style="display: none;">ID:</label>
+                <input type="scooter_id" name="scooter_id" value="{{ selected_scooter['scooterID'] }}" style="display: none;" />
+
+                <label for="fault_notes">Fault Notes:</label>
+                <input type="text" name="fault_notes" value="" required />
+
+                <button type="submit">Report Fault</button>
+            </form>
+        {% endif %}
+
+
+        <!-- Button to go back to the customer list -->
+        <button class="back-button" onclick="window.location.href='/home'">
+            Back to Dashboard
+          </button>
+    </div>
+</body>
+</html>

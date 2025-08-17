@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Maintenance Requests</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0ff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .header {
+        width: 100%;
+        background-color: #6a0dad;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .header h2 {
+        margin: 0;
+        flex-grow: 1;
+        text-align: center;
+      }
+
+      .requests-container {
+        width: 90%;
+        margin-top: 20px;
+      }
+
+      .panel {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .panel h3 {
+        margin-bottom: 15px;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+        border-radius: 5px;
+        white-space: pre-line;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .back-button {
+        padding: 10px;
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        position: absolute;
+        right: 30px;
+      }
+
+      .back-button:hover {
+        background-color: #5a0cac;
+      }
+
+      .button {
+        padding: 10px;
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        width: 150px;
+      }
+
+      .button:hover {
+        background-color: #5a0cac;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      table th,
+      table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+
+      table th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <div class="header">
+      <h2>Engineer Maintenance Requests</h2>
+      <button
+        class="back-button"
+        onclick="window.location.href='/eng_dashboard'"
+      >
+        Back to Dashboard
+      </button>
+    </div>
+
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="message">
+      {% for category, message in messages %}
+      <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <!-- Maintenance Requests -->
+    <div class="requests-container">
+      {% if requests %}
+      <table>
+        <thead>
+          <tr>
+            <th>Fault ID</th>
+            <th>Scooter ID</th>
+            <th>Make</th>
+            <th>Colour</th>
+            <th>Power</th>
+            <th>Fault Description</th>
+            <th>Status</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in requests %}
+          <tr>
+            <td>{{ request.faultID }}</td>
+            <td>{{ request.scooterID }}</td>
+            <td>{{ request.make }}</td>
+            <td>{{ request.colour }}</td>
+            <td>{{ request.power }}</td>
+            <td>{{ request.faultNotes }}</td>
+            <td>{{ request.status }}</td>
+            <td>{{ request.latitude }}</td>
+            <td>{{ request.longitude }}</td>
+            <td>
+              <!-- Button to report the repair -->
+              <button
+                class="button"
+                onclick="window.location.href='{{ url_for('report_repair', fault_id=request.faultID) }}'"
+              >
+                Report Repair
+              </button>
+              <!-- Button to find the scooter's location on Google Maps -->
+              <button
+                class="button"
+                onclick="window.location.href='{{ url_for('find_scooter_location', scooter_id=request.scooterID) }}'"
+              >
+                View on Map
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No maintenance requests found.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
